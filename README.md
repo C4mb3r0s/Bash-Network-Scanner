@@ -1,44 +1,17 @@
-<div align=center>
+<div align="center">
 
-# 🔍 bash-network-scanner
+# 🔍 portScan
 
 <img src="https://img.shields.io/badge/Shell-Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white"/>
 <img src="https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
 
-Script interactivo en Bash para el escaneo de puertos y descubrimiento de hosts en una red local. Cuenta con un menu navegable desde la terminal, salida con colores y tres modos de operacion, todo sin dependencias externas.
+**Script interactivo en Bash para el escaneo de puertos y descubrimiento de hosts en una red local. Menú navegable desde la terminal, salida con colores y tres modos de operación — sin dependencias externas.**
 
 </div>
 
 ---
 
-## ✨ Caracteristicas
-
-- 🎛️ Menu interactivo navegable con flechas `↑↓` o teclas `j/k`
-- ⚡ Escaneo en paralelo mediante hilos (`&` + `wait`) para maxima velocidad
-- 🎨 Salida con colores para identificar resultados de forma rapida
-- 🔎 Tres modos: puertos abiertos, puertos con servicio y hosts activos en la red
-- ✅ Validacion de entrada para el rango de red
-- 🚫 Sin dependencias externas — solo Bash nativo
-- 🖥️ Compatible con sistemas Linux
-
----
-
-## ⚙️ Requisitos
-
-- Bash 4+
-- Sistema operativo Linux
-- Permisos de ejecucion sobre el script
-
----
-
-## 🚀 Uso
-
-```bash
-chmod +x portScan.sh
-./portScan.sh
-```
-
-Al ejecutarlo, se desplegara un menu interactivo en la terminal:
+### 📸 Preview
 
 ```
 ╔══════════════════════════════════════╗
@@ -52,29 +25,66 @@ Al ejecutarlo, se desplegara un menu interactivo en la terminal:
     Salir
 ```
 
-| Tecla | Accion |
-|-------|--------|
-| `↑` / `k` | Mover seleccion hacia arriba |
-| `↓` / `j` | Mover seleccion hacia abajo |
-| `Enter` | Confirmar seleccion |
-| `q` / `Q` | Salir del programa |
-| `Ctrl+C` | Interrupcion de emergencia |
+---
 
-> 💡 El cursor se oculta automaticamente durante el escaneo y se restaura al finalizar o al interrumpir con `Ctrl+C`.
+## ✨ Características
+
+- 🎛️ Menú interactivo navegable con flechas `↑↓` o teclas `j/k`
+- ⚡ Escaneo en paralelo mediante hilos (`&` + `wait`) para máxima velocidad
+- 🎨 Salida con colores para identificar resultados de forma rápida
+- 🔎 Tres modos: puertos abiertos, puertos con servicio y hosts activos en la red
+- ✅ Validación de entrada para el rango de red
+- 🚫 Sin dependencias externas — solo Bash nativo
+- 🖥️ Compatible con sistemas Linux
 
 ---
 
-## 🛠️ Modos de operacion
+## ⚙️ Requisitos
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| `bash` 4+ | Intérprete de shell |
+| `ping` | Descubrimiento de hosts (modo 3) |
+| `getent` | Resolución de nombres de servicios (modo 2) |
+
+> El script no requiere ningún paquete externo.
+
+---
+
+## 🚀 Uso
+
+```bash
+git clone https://github.com/C4mb3r0s/portScan.git
+cd portScan
+chmod +x portScan.sh
+./portScan.sh
+```
+
+### Controles del menú
+
+| Tecla | Acción |
+|-------|--------|
+| `↑` / `k` | Mover selección hacia arriba |
+| `↓` / `j` | Mover selección hacia abajo |
+| `Enter` | Confirmar selección |
+| `q` / `Q` | Salir del programa |
+| `Ctrl+C` | Interrupción de emergencia |
+
+> 💡 El cursor se oculta automáticamente durante el escaneo y se restaura al finalizar o al interrumpir con `Ctrl+C`.
+
+---
+
+## 🛠️ Modos de operación
 
 ### Modo 1 — Escaneo de puertos abiertos
 
-Invoca la funcion `openPorts()`. Escanea todos los puertos del `1` al `65535` en `127.0.0.1` e imprime en verde los que se encuentran abiertos.
+Escanea todos los puertos del `1` al `65535` en `127.0.0.1` e imprime en verde los que se encuentran abiertos.
 
 **Salida esperada:**
 
 ```
-[+] Puerto 22 -> OPEN
-[+] Puerto 80 -> OPEN
+[+] Puerto 22  -> OPEN
+[+] Puerto 80  -> OPEN
 [+] Puerto 443 -> OPEN
 ```
 
@@ -82,7 +92,7 @@ Invoca la funcion `openPorts()`. Escanea todos los puertos del `1` al `65535` en
 
 ### Modo 2 — Escaneo de puertos + servicio
 
-Invoca la funcion `openPortsWithService()`. Realiza el mismo escaneo que el Modo 1, pero adicionalmente resuelve el nombre del servicio asociado a cada puerto mediante `getent services`. Si el servicio no es reconocido, se muestra como `desconocido`.
+Realiza el mismo escaneo que el Modo 1, pero además resuelve el nombre del servicio asociado a cada puerto mediante `getent services`. Si el servicio no es reconocido, se muestra como `desconocido`.
 
 **Salida esperada:**
 
@@ -97,9 +107,7 @@ Invoca la funcion `openPortsWithService()`. Realiza el mismo escaneo que el Modo
 
 ### Modo 3 — Descubrimiento de hosts en la red
 
-Invoca la funcion `activeHosts()`. Solicita al usuario que ingrese el prefijo de red (ej: `192.168.1`). Si se presiona `Enter` sin ingresar nada, se usa `192.168.1` como valor por defecto. Valida que el formato sea correcto (3 octetos numericos validos) antes de proceder.
-
-Escanea los hosts `.1` al `.254` del rango indicado usando `ping` con un timeout de 1 segundo por host.
+Solicita el prefijo de red (ej: `192.168.1`). Si se presiona `Enter` sin ingresar nada, usa `192.168.1` como valor por defecto. Valida el formato antes de proceder y escanea los hosts `.1` al `.254` con `ping` y un timeout de 1 segundo.
 
 **Salida esperada:**
 
@@ -112,18 +120,27 @@ Escanea los hosts `.1` al `.254` del rango indicado usando `ping` con un timeout
 
 ---
 
-## 📋 Notas tecnicas
+## 📋 Notas técnicas
 
-- El uso de `&` en cada iteracion lanza los intentos de conexion en paralelo, y `wait` espera a que todos los procesos hijos finalicen antes de continuar. Esto reduce el tiempo de escaneo de horas a minutos.
-- Los modos 1 y 2 escanean unicamente `127.0.0.1` (localhost). Para escanear otro host, modifica la IP directamente en la funcion correspondiente dentro del script.
-- El modo 3 asume una subred `/24`. Para rangos distintos, ajusta el script segun sea necesario.
-- `tput civis` / `tput cnorm` se utilizan para ocultar y restaurar el cursor durante el escaneo, mejorando la experiencia visual en la terminal.
+- El uso de `&` en cada iteración lanza los intentos de conexión en paralelo, y `wait` espera a que todos los procesos hijos finalicen. Esto reduce el tiempo de escaneo de horas a minutos.
+- Los modos 1 y 2 escanean únicamente `127.0.0.1` (localhost). Para escanear otro host, modifica la IP directamente en la función correspondiente dentro del script.
+- El modo 3 asume una subred `/24`. Para rangos distintos, ajusta el script según sea necesario.
+- `tput civis` / `tput cnorm` se utilizan para ocultar y restaurar el cursor durante el escaneo, mejorando la experiencia visual.
+
+---
+
+## 📁 Estructura
+
+```
+portScan/
+└── portScan.sh   # Script principal
+```
 
 ---
 
 ## ⚠️ Aviso legal
 
-Este script es de uso **educativo y de diagnostico personal**. Asegurate de contar con autorizacion explicita antes de escanear cualquier red o sistema que no sea de tu propiedad. El escaneo no autorizado de redes puede ser considerado ilegal en muchas jurisdicciones.
+Este script es de uso **educativo y de diagnóstico personal**. Asegúrate de contar con autorización explícita antes de escanear cualquier red o sistema que no sea de tu propiedad. El escaneo no autorizado de redes puede ser considerado ilegal en muchas jurisdicciones.
 
 ---
 
