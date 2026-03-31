@@ -1,7 +1,13 @@
+<div align=center>
+
 # 🔍 bash-network-scanner
+
+<img src="https://img.shields.io/badge/Shell-Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white"/>
+<img src="https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
 
 Script interactivo en Bash para el escaneo de puertos y descubrimiento de hosts en una red local. Cuenta con un menu navegable desde la terminal, salida con colores y tres modos de operacion, todo sin dependencias externas.
 
+</div>
 ---
 
 ## ✨ Caracteristicas
