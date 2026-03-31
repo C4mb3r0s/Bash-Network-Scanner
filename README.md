@@ -64,6 +64,7 @@ Al ejecutarlo, se desplegara un menu interactivo en la terminal:
 Invoca la funcion `openPorts()`. Escanea todos los puertos del `1` al `65535` en `127.0.0.1` e imprime en verde los que se encuentran abiertos.
 
 **Salida esperada:**
+
 ```
 [+] Puerto 22 -> OPEN
 [+] Puerto 80 -> OPEN
@@ -77,6 +78,7 @@ Invoca la funcion `openPorts()`. Escanea todos los puertos del `1` al `65535` en
 Invoca la funcion `openPortsWithService()`. Realiza el mismo escaneo que el Modo 1, pero adicionalmente resuelve el nombre del servicio asociado a cada puerto mediante `getent services`. Si el servicio no es reconocido, se muestra como `desconocido`.
 
 **Salida esperada:**
+
 ```
 [+] Puerto 22   -> OPEN (ssh)
 [+] Puerto 80   -> OPEN (http)
@@ -93,6 +95,7 @@ Invoca la funcion `activeHosts()`. Solicita al usuario que ingrese el prefijo de
 Escanea los hosts `.1` al `.254` del rango indicado usando `ping` con un timeout de 1 segundo por host.
 
 **Salida esperada:**
+
 ```
 [*] Escaneando 192.168.1.1 - 192.168.1.254 ...
 
@@ -119,5 +122,10 @@ Este script es de uso **educativo y de diagnostico personal**. Asegurate de cont
 
 ## 👤 Autor
 
-**Eduardo Camberos**  
-GitHub: [C4mb3ros](https://github.com/C4mb3ros)
+<div align="center">
+
+**Eduardo Camberos**
+
+[![GitHub](https://img.shields.io/badge/GitHub-C4mb3r0s-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/C4mb3r0s)
+
+</div>
