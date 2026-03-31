@@ -1,13 +1,16 @@
 # 🔍 bash-network-scanner
 
-Script en Bash para el escaneo de puertos y descubrimiento de hosts en una red local. Utiliza `/dev/tcp` y `ping` de forma completamente nativa, sin dependencias externas como `nmap`.
+Script interactivo en Bash para el escaneo de puertos y descubrimiento de hosts en una red local. Cuenta con un menu navegable desde la terminal, salida con colores y tres modos de operacion, todo sin dependencias externas.
 
 ---
 
 ## ✨ Caracteristicas
 
+- 🎛️ Menu interactivo navegable con flechas `↑↓` o teclas `j/k`
 - ⚡ Escaneo en paralelo mediante hilos (`&` + `wait`) para maxima velocidad
-- 🔎 Tres modos de operacion: puertos, puertos con servicio y hosts activos
+- 🎨 Salida con colores para identificar resultados de forma rapida
+- 🔎 Tres modos: puertos abiertos, puertos con servicio y hosts activos en la red
+- ✅ Validacion de entrada para el rango de red
 - 🚫 Sin dependencias externas — solo Bash nativo
 - 🖥️ Compatible con sistemas Linux
 
@@ -28,75 +31,89 @@ chmod +x portScan.sh
 ./portScan.sh
 ```
 
-> 💡 El script oculta el cursor durante la ejecucion y lo restaura automaticamente al finalizar. Puedes interrumpirlo en cualquier momento con `Ctrl+C`.
+Al ejecutarlo, se desplegara un menu interactivo en la terminal:
+
+```
+╔══════════════════════════════════════╗
+║         Port Scanner & Net Tool      ║
+╚══════════════════════════════════════╝
+  Usa ↑↓ o j/k para navegar, Enter para seleccionar
+
+  > Escanear puertos abiertos (sin servicio)
+    Escanear puertos abiertos con servicio
+    Detectar hosts activos en la red local
+    Salir
+```
+
+| Tecla | Accion |
+|-------|--------|
+| `↑` / `k` | Mover seleccion hacia arriba |
+| `↓` / `j` | Mover seleccion hacia abajo |
+| `Enter` | Confirmar seleccion |
+| `q` / `Q` | Salir del programa |
+| `Ctrl+C` | Interrupcion de emergencia |
+
+> 💡 El cursor se oculta automaticamente durante el escaneo y se restaura al finalizar o al interrumpir con `Ctrl+C`.
 
 ---
 
 ## 🛠️ Modos de operacion
 
-El script cuenta con **3 modos de operacion**. Solo uno debe estar activo (descomentado) a la vez; los otros dos deben permanecer comentados.
-
----
-
 ### Modo 1 — Escaneo de puertos abiertos
 
-Escanea todos los puertos del `1` al `65535` en `127.0.0.1` e imprime los que se encuentran abiertos.
+Invoca la funcion `openPorts()`. Escanea todos los puertos del `1` al `65535` en `127.0.0.1` e imprime en verde los que se encuentran abiertos.
 
-```bash
-for port in $(seq 1 65535); do
-  (echo '' >/dev/tcp/127.0.0.1/$port) 2>/dev/null && echo "[+] $port -> OPEN" &
-done
-wait
+**Salida esperada:**
 ```
-
-**Para activar:** descomenta este bloque y comenta los otros dos.
+[+] Puerto 22 -> OPEN
+[+] Puerto 80 -> OPEN
+[+] Puerto 443 -> OPEN
+```
 
 ---
 
-### Modo 2 — Escaneo de puertos + servicio *(activo por defecto)*
+### Modo 2 — Escaneo de puertos + servicio
 
-Escanea todos los puertos del `1` al `65535` en `127.0.0.1` e imprime los que estan abiertos junto con el nombre del servicio asociado a cada uno.
+Invoca la funcion `openPortsWithService()`. Realiza el mismo escaneo que el Modo 1, pero adicionalmente resuelve el nombre del servicio asociado a cada puerto mediante `getent services`. Si el servicio no es reconocido, se muestra como `desconocido`.
 
-```bash
-for port in $(seq 1 65535); do
-  (echo '' >/dev/tcp/127.0.0.1/$port) 2>/dev/null &&
-    service=$(getent services $port | awk '{print $1}') &&
-    echo "[+] $port -> OPEN ($service)" &
-done
-wait
+**Salida esperada:**
 ```
-
-**Para activar:** este modo ya esta activo por defecto. Comenta los otros dos si los activaste previamente.
+[+] Puerto 22   -> OPEN (ssh)
+[+] Puerto 80   -> OPEN (http)
+[+] Puerto 3306 -> OPEN (mysql)
+[+] Puerto 9090 -> OPEN (desconocido)
+```
 
 ---
 
 ### Modo 3 — Descubrimiento de hosts en la red
 
-Escanea los 255 posibles hosts de la subred `192.168.1.0/24` mediante `ping` e imprime cuales se encuentran activos.
+Invoca la funcion `activeHosts()`. Solicita al usuario que ingrese el prefijo de red (ej: `192.168.1`). Si se presiona `Enter` sin ingresar nada, se usa `192.168.1` como valor por defecto. Valida que el formato sea correcto (3 octetos numericos validos) antes de proceder.
 
-```bash
-for i in $(seq 1 255); do
-  timeout 1 bash -c "ping -c 1 192.168.1.$i" &>/dev/null && echo "[+] Host 192.168.1.$i is UP" &
-done
-wait
+Escanea los hosts `.1` al `.254` del rango indicado usando `ping` con un timeout de 1 segundo por host.
+
+**Salida esperada:**
 ```
+[*] Escaneando 192.168.1.1 - 192.168.1.254 ...
 
-**Para activar:** descomenta este bloque y comenta los otros dos.  
-> ⚠️ Recuerda cambiar el prefijo `192.168.1` por el de tu red local si es diferente.
+[+] Host 192.168.1.1   esta ACTIVO
+[+] Host 192.168.1.105 esta ACTIVO
+```
 
 ---
 
-## 📋 Notas
+## 📋 Notas tecnicas
 
-- El uso de hilos (`&` + `wait`) permite ejecutar multiples conexiones de forma concurrente, reduciendo drasticamente el tiempo total de escaneo.
-- El escaneo se realiza unicamente sobre `127.0.0.1` (localhost) en los modos 1 y 2. Modifica la IP segun el objetivo deseado.
-- El descubrimiento de hosts (Modo 3) asume una subred `/24`. Ajusta el rango si tu red es diferente.
+- El uso de `&` en cada iteracion lanza los intentos de conexion en paralelo, y `wait` espera a que todos los procesos hijos finalicen antes de continuar. Esto reduce el tiempo de escaneo de horas a minutos.
+- Los modos 1 y 2 escanean unicamente `127.0.0.1` (localhost). Para escanear otro host, modifica la IP directamente en la funcion correspondiente dentro del script.
+- El modo 3 asume una subred `/24`. Para rangos distintos, ajusta el script segun sea necesario.
+- `tput civis` / `tput cnorm` se utilizan para ocultar y restaurar el cursor durante el escaneo, mejorando la experiencia visual en la terminal.
 
 ---
 
 ## ⚠️ Aviso legal
 
-Este script es de uso educativo. Asegurate de tener autorizacion explicita antes de escanear cualquier red o sistema que no sea de tu propiedad. El uso no autorizado puede ser ilegal.
+Este script es de uso **educativo y de diagnostico personal**. Asegurate de contar con autorizacion explicita antes de escanear cualquier red o sistema que no sea de tu propiedad. El escaneo no autorizado de redes puede ser considerado ilegal en muchas jurisdicciones.
 
 ---
 
